@@ -1,0 +1,32 @@
+---
+- name: Add EPEL repositary to yum
+  yum:
+    name: epel-release
+    state: installed
+
+- name: Install httpd and nginx
+  yum: name={{ item }} state=installed
+  with_items:
+    - nginx
+    - httpd-tools
+
+- name: Set htpasswd for nginx
+  shell: htpasswd -bc /etc/nginx/htpasswd.users {{ username }} {{ password }}
+  become: yes
+  become_user: root
+
+- name: Copy nginx config file
+  copy:
+    src: ../files/nginx.conf
+    dest: /etc/nginx/nginx.conf
+
+- name: Move kibana config file for nginx authentication
+  template:
+    src: ../templates/kibana.j2
+    dest: /etc/nginx/conf.d/kibana.conf
+
+- name: Restart nginx
+  service:
+    name: nginx
+    state: restarted
+    enabled: yes

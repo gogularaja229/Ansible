@@ -1,0 +1,7 @@
+---
+hostip: 127.0.0.1
+datapath: /tmp
+condition: true
+username: kibanaadmin
+password: kibana
+servername: elk

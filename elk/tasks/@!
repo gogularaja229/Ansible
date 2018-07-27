@@ -1,0 +1,11 @@
+---
+- name: Copy the config file of logstash
+  copy:
+    src: ../files/logstash.repo
+    dest: /etc/yum.repos.d/logstash.repo
+
+- name: Install logstash
+  yum:
+    name: logstash
+    state: installed
+  

@@ -1,0 +1,70 @@
+---
+- hosts: host2
+  tasks:
+#    - name: Download the java
+#      get_url:
+#        url: https://s3-ap-southeast-1.amazonaws.com/gogulraja/jdk-8u73-linux-x64.rpm
+#        dest: /tmp/jdk-8u73-linux-x64.rpm
+
+    - include_vars:
+        dir: '../vars'
+
+    - name: Install java1.8
+      yum:
+        name: /tmp/jdk-8u73-linux-x64.rpm
+        state: present 
+
+    - name: Import rpm gpg key for elasticsearch
+      rpm_key:
+        state: present
+        key: http://packages.elastic.co/GPG-KEY-elasticsearch
+
+    - name: copy the repositary file for elasticsearch
+      copy:
+        src: ../files/elasticsearch.repo
+        dest: /etc/yum.repos.d/elasticsearch.repo
+
+    - name: Install elasticsearch
+      yum:
+        name: elasticsearch
+        state: installed
+
+    - name: Elasticsearch config file changes
+      lineinfile:
+        dest: /etc/elasticsearch/elasticsearch.yml
+        regexp: '\bnetwork.host\b'
+        line: 'network.host: {{ hostip  }}'
+      notify:
+        - start elasticsearch
+
+    - debug: var=condition
+
+    - name: Edit config file
+      lineinfile:
+        dest: /etc/elasticsearch/elasticsearch.yml
+        regexp: '\bpath.data\b'
+        line: 'path.data: {{ datapath  }}'
+      when: condition == true
+
+    - include: kibana.yml
+    - include: logstash.yml
+    - include: nginx.yml
+
+  handlers:
+    - name: start elasticsearch
+      service: 
+        name: elasticsearch 
+        state: started 
+        enabled: yes
+
+    - name: start kibana
+      service:
+        name: kibana
+        state: started
+        enabled: yes
+
+    - name: start logstash
+      service:
+        name: logstash
+        state: started
+        enabled: yes

@@ -1,0 +1,18 @@
+---
+- name: Copy config file of kibana
+  copy:
+    src: ../files/kibana.repo
+    dest: /etc/yum.repos.d/kibana.repo
+
+- name: Install Kibana
+  yum:
+    name: kibana
+    state: installed
+
+- name: Config file changes in kibana
+  lineinfile:
+    dest: /opt/kibana/config/kibana.yml
+    regexp: '\bserver.host\b'
+    line: 'server.host: {{ hostip }}'
+  notify:
+    - start kibana 

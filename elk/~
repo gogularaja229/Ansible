@@ -1,0 +1,18 @@
+---
+- hosts: host1
+  tasks:
+   # - name: Download the java package 
+   #   command: "wget --no-cookies --no-check-certificate --header 'Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie' 'http://download.oracle.com/otn-pub/java/jdk/8u73-b02/jdk-8u73-linux-x64.rpm'"
+   #   args:
+   #     chdir: /tmp
+
+    - name: Install java1.8
+      yum:
+        name: /tmp/jdk-8u73-linux-x64.rpm
+        state: present 
+
+    - name: Import rpm gpg key for elasticsearch
+      rpm_key:
+        state: present
+        key: http://packages.elastic.co/GPG-KEY-elasticsearch
+
